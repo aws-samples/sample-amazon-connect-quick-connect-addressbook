@@ -128,6 +128,6 @@ fabric.properties
 .cdk.staging/
 cdk.out/
 
-.idea
+.idea/
 repolinter_report.md
 */.aws-sam
