@@ -1,13 +1,19 @@
 package com.amazonaws.cdk;
 
+import io.github.cdklabs.cdknag.AwsSolutionsChecks;
+import io.github.cdklabs.cdknag.NagPackProps;
 import software.amazon.awscdk.App;
+import software.amazon.awscdk.Aspects;
 import software.amazon.awscdk.StackProps;
 
 public class InfraApp {
     public static void main(final String[] args) {
         App app = new App();
-
+        Aspects.of(app).add(new AwsSolutionsChecks(NagPackProps.builder()
+                .verbose(true)
+                .build()));
         new InfraStack(app, "InfraStack", StackProps.builder()
+                .stackName("QuickConnect-Stack")
                 // If you don't specify 'env', this stack will be environment-agnostic.
                 // Account/Region-dependent features and context lookups will not work,
                 // but a single synthesized template can be deployed anywhere.

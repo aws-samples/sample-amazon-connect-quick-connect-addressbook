@@ -1,0 +1,3 @@
+quickConnectName,quickConnectType,destinationId,contactFlowId,description
+quick-connect-1,Phone,+11234567890,,PhoneNumberTransfer
+quick-connect-2,Queue,5b210f8d-6e0a-490f-9264-28c2b809df51,9dba5adb-b389-4a6a-9ef2-d42ea9ef3693,QueueTransfer

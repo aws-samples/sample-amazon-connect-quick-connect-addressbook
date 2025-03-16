@@ -1,93 +1,130 @@
-# sample-amazon-connect-quick-connect-addressbook
+# Amazon Connect Quick Connect as Address Book - Automation
 
+The Amazon Connect - Quick Connects are a way for you to create a list of destinations for common transfers. This Java-based solution automates the creation and management of Quick Connects in Amazon Connect contact centers. It streamlines the process of setting up and maintaining quick connects configurations for agents, phone numbers, and queues.
 
+This solution provides a serverless implementation using AWS Lambda and AWS CDK for infrastructure deployment. It enables contact center administrators to manage Quick Connects through CSV files stored in S3 buckets, supporting three types of Quick Connects: User, PhoneNumber, and Queue. 
+This solution automatically associates Quick Connects with all the queues and maintains consistent routing configurations across the contact center environment.
 
-## Getting started
+## Architecture
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+![Architecture Diagram](images/amazon-connect-quick-connect.png)
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+Below are the services that are required for deploying the solution.
 
-## Add your files
+* [Amazon Connect](https://docs.aws.amazon.com/connect/latest/adminguide/what-is-amazon-connect.html)
+* [AWS Lambda](https://docs.aws.amazon.com/lambda/latest/dg/welcome.html)
+* [Amazon S3](https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html)
+* [Amazon EventBridge](https://docs.aws.amazon.com/eventbridge/latest/userguide/what-is-amazon-eventbridge.html)
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+## Pre-requisites
 
-```
-cd existing_repo
-git remote add origin https://gitlab.aws.dev/aruthan/sample-amazon-connect-quick-connect-addressbook.git
-git branch -M main
-git push -uf origin main
-```
+Before getting started, make sure you have the following:
 
-## Integrate with your tools
+- AWS Account
+- Amazon Connect Instance
+- Docker installed on your local machine
+  - Docker version 27 or later. If missing install Docker from [here](https://docs.docker.com/engine/install/).
+    ```shell
+    docker --version
+    ```
+- Java Development Kit (JDK) installed on your local machine
+  - Java 21 or later. If missing install Amazon Corretto Java 21 from [here](https://docs.aws.amazon.com/corretto/latest/corretto-21-ug/what-is-corretto-21.html).
+    ```shell
+    java --version
+    ```
 
-- [ ] [Set up project integrations](https://gitlab.aws.dev/aruthan/sample-amazon-connect-quick-connect-addressbook/-/settings/integrations)
+  - Maven 3.9 or later. If missing install Maven from [here](https://maven.apache.org/download.cgi).
+  - Note: Java version showed in the below output should be 21 or later.
+    ```shell
+    mvn --version
+    ```
 
-## Collaborate with your team
+- AWS CLI configured with valid credentials
+  - AWS CLI. If missing install latest AWS CLI from [here](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html).
+    ```shell
+    aws --version
+    ```
+- Node.js and npm installed (required for CDK)
+  - Node.js 22.x or later. If missing install Node.js from [here](https://nodejs.org/en/download/).
+    ```shell
+    node --version
+    ```
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+- AWS CDK - Install the latest [AWS CDK Toolkit](https://docs.aws.amazon.com/cdk/v2/guide/cli.html) globally using the following command:
+    ```shell
+    npm install -g aws-cdk
+    ```
+    ```shell
+    cdk --version
+    ```
+  - CDK Bootstrap - Bootstrap your AWS account for CDK. This only needs to be done once per account/region.
+    ```shell
+    cdk bootstrap aws://<account>/<region>
+    ```
 
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
 
 ## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+Clone the repository:
+```bash
+git clone <repository-url>
+cd sample-amazon-connect-quick-connect-addressbook
+```
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+Build the project:
+```bash
+mvn clean install
+```
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+Configure these values before deploying the infrastructure; Update the file [cdk.context.json](./Infra/cdk.context.json) with your values.
+<br> Note: ProcessQuickConnectType - All (default), User, Phone or Queue 
+  ```json
+    {
+      "InstanceId": "<AmazonConnectInstanceId>",
+      "DefaultAgentTransferFlowId": "<DefaultAgentTransferFlowId>",
+      "ProcessQuickConnectType": "All"
+    }
+  ```
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+Deploy the infrastructure:
+```bash
+cd Infra
+cdk deploy
+```
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+## Verify
+Make sure you are in the right AWS account and region.
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+[AWS CloudFormation](https://us-west-2.console.aws.amazon.com/cloudformation/home) will create similar to below resources
+<br> Note: Not all the resources are shown in the screenshot below.
+![AWSCloudformation_Resources.png](/images/AWSCloudformation_Resources.png)
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
 
-## License
-For open source projects, say how it is licensed.
+## Quick Start
+1. Prepare your Quick Connect CSV file following the sample format:
+Note: 
+   1. You need the below CSV file only for PhoneNumber and Queue Type (quickConnectType).
+   2. User Type will be created and managed using the user information available in the Amazon Connect User Management. 
+```csv
+quickConnectName,quickConnectType,destinationId,contactFlowId,description
+quick-connect-1,Phone,+11234567890,,PhoneNumberTransfer
+quick-connect-2,Queue,5b210f8d-6e0a-490f-9264-28c2b809df51,9dba5adb-b389-4a6a-9ef2-d42ea9ef3693,QueueTransfer
+```
+  - quickConnectName -> Name for the QuickConnect.
+  - quickConnectType -> Phone or Queue.
+  - destinationId -> 
+    - When quickConnectType is Phone -> destinationId is PhoneNumber in E.164 format.
+    - When quickConnectType is Queue -> destinationId is QueueID.
+  - contactFlowId -> Required only for quickConnectType = Queue, its Queue Transfer Contact Flow Id.
+  - description -> Description of QuickConnect.
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+2. Upload the CSV file to the configured S3 bucket to trigger the Quick Connect creation process.
+
+
+## Cleanup
+
+Run the below command to delete the application.
+```shell
+cdk destroy
+```
+This will delete all the provisioned resources from your AWS account.

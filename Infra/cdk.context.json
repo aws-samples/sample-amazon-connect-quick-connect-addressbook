@@ -1,0 +1,5 @@
+{
+  "InstanceId": "<AmazonConnectInstanceId>",
+  "DefaultAgentTransferFlowId": "<DefaultAgentTransferFlowId>",
+  "ProcessQuickConnectType": "All"
+}
