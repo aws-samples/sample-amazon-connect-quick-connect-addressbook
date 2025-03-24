@@ -63,6 +63,10 @@
         </dependency>
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
+            <artifactId>connect</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
             <artifactId>dynamodb</artifactId>
         </dependency>
         <dependency>
@@ -105,7 +109,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <finalName>ExtractIDPFunction</finalName>
+                    <finalName>QuickConnectFunction</finalName>
                     <outputDirectory>../assets</outputDirectory>
                 </configuration>
             </plugin>
