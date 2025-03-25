@@ -7,7 +7,7 @@ This solution automatically associates Quick Connects with all the queues and ma
 
 ## Architecture
 
-![Architecture Diagram](images/amazon-connect-quick-connect.drawio.png)
+![Architecture Diagram](images/amazon-connect-quick-connect.png)
 
 Below are the services that are required for deploying the solution.
 

@@ -131,3 +131,4 @@ cdk.out/
 .idea/
 repolinter_report.md
 */.aws-sam
+*ThreatModel*
