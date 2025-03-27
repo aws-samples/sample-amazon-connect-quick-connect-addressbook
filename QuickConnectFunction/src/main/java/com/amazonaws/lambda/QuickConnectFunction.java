@@ -45,8 +45,6 @@ public class QuickConnectFunction implements RequestHandler<Object, String> {
         // Get the S3 bucket and key from the event
         try {
             String eventString = objectMapper.writeValueAsString(event);
-            logger.log("Event = " + eventString);
-            logger.log("\n");
             eventJSONMap = objectMapper.readTree(eventString);
             // If the Event is from S3, else its assumed it's from EventBridge
             if (eventJSONMap.has("Records")) {
