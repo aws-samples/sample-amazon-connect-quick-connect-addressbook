@@ -231,6 +231,7 @@ public class QuickConnectFunction implements RequestHandler<Object, String> {
         // Build a list of current users in the Instance
         SearchUsersResponse searchUsersResponse = connectClient.searchUsers(SearchUsersRequest.builder()
                 .instanceId(instanceId)
+                .maxResults(500)
                 .build());
 
         searchUsersResponse.users().forEach(user -> {
