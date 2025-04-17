@@ -17,6 +17,8 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -380,9 +382,12 @@ public class QuickConnectFunction implements RequestHandler<Object, String> {
     private List<QuickConnectCSVRecord> readCsvFromS3(String bucket, String key) throws IOException {
         List<QuickConnectCSVRecord> records = new ArrayList<>();
 
+        // To handle special characters in the S3 key
+        String decodedKey = URLDecoder.decode(key, StandardCharsets.UTF_8);
+
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucket)
-                .key(key)
+                .key(decodedKey)
                 .build();
 
         try (BufferedReader br = new BufferedReader(new InputStreamReader(
