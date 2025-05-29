@@ -7,8 +7,6 @@ import com.amazonaws.services.lambda.runtime.logging.LogLevel;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.services.connect.ConnectClient;
 import software.amazon.awssdk.services.connect.model.*;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -26,7 +24,7 @@ import java.util.Map;
 
 public class QuickConnectFunction implements RequestHandler<Object, String> {
     private static final ObjectMapper objectMapper = new ObjectMapper();
-    private static final Logger log = LoggerFactory.getLogger(QuickConnectFunction.class);
+
     // AWS Services
     private final ConnectClient connectClient = ConnectClient.builder().build();
     private final S3Client s3Client = S3Client.builder().build();
