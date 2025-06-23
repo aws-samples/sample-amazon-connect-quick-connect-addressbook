@@ -13,11 +13,11 @@ import software.amazon.awscdk.services.s3.BlockPublicAccess;
 import software.amazon.awscdk.services.s3.Bucket;
 import software.amazon.awscdk.services.s3.BucketEncryption;
 import software.amazon.awscdk.services.s3.notifications.LambdaDestination;
-import software.amazon.awscdk.services.scheduler.alpha.CronOptionsWithTimezone;
-import software.amazon.awscdk.services.scheduler.alpha.Schedule;
-import software.amazon.awscdk.services.scheduler.alpha.ScheduleExpression;
-import software.amazon.awscdk.services.scheduler.alpha.ScheduleTargetInput;
-import software.amazon.awscdk.services.scheduler.targets.alpha.LambdaInvoke;
+import software.amazon.awscdk.services.scheduler.CronOptionsWithTimezone;
+import software.amazon.awscdk.services.scheduler.Schedule;
+import software.amazon.awscdk.services.scheduler.ScheduleExpression;
+import software.amazon.awscdk.services.scheduler.ScheduleTargetInput;
+import software.amazon.awscdk.services.scheduler.targets.LambdaInvoke;
 import software.constructs.Construct;
 
 import java.util.List;

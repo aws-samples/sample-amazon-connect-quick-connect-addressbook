@@ -35,6 +35,131 @@ public class QuickConnectFunction implements RequestHandler<Object, String> {
     private LambdaLogger logger;
     private List<QueueSummary> allQueues = new ArrayList<>();
 
+    /**
+     * Simple retry method for updateQuickConnectName to handle the default rate limit (2 requests/sec)
+     */
+    private void updateQuickConnectNameWithRetry(UpdateQuickConnectNameRequest request) {
+        int maxRetries = 3;
+        int retryCount = 0;
+        
+        while (retryCount < maxRetries) {
+            try {
+                connectClient.updateQuickConnectName(request);
+                return; // Success, exit the method
+            } catch (TooManyRequestsException e) {
+                retryCount++;
+                logger.log("Rate limit hit, retry attempt " + retryCount + "/" + maxRetries, LogLevel.WARN);
+                
+                if (retryCount >= maxRetries) {
+                    logger.log("Max retries reached for updateQuickConnectName", LogLevel.ERROR);
+                    throw e; // Re-throw after max retries
+                }
+                
+                try {
+                    // Wait 1000ms before retry (2 requests/sec = 1000ms between requests)
+                    Thread.sleep(1000);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("Interrupted during retry wait", ie);
+                }
+            }
+        }
+    }
+
+    /**
+     * Simple retry method for deleteQuickConnect to handle rate limiting (2 requests/sec)
+     */
+    private void deleteQuickConnectWithRetry(DeleteQuickConnectRequest request) {
+        int maxRetries = 3;
+        int retryCount = 0;
+        
+        while (retryCount < maxRetries) {
+            try {
+                connectClient.deleteQuickConnect(request);
+                return; // Success, exit the method
+            } catch (TooManyRequestsException e) {
+                retryCount++;
+                logger.log("Rate limit hit, retry attempt " + retryCount + "/" + maxRetries, LogLevel.WARN);
+                
+                if (retryCount >= maxRetries) {
+                    logger.log("Max retries reached for deleteQuickConnect", LogLevel.ERROR);
+                    throw e; // Re-throw after max retries
+                }
+                
+                try {
+                    // Wait 1000ms before retry (2 requests/sec = 1000ms between requests)
+                    Thread.sleep(1000);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("Interrupted during retry wait", ie);
+                }
+            }
+        }
+    }
+
+    /**
+     * Simple retry method for associateQueueQuickConnects to handle rate limiting (2 requests/sec)
+     */
+    private void associateQueueQuickConnectsWithRetry(AssociateQueueQuickConnectsRequest request) {
+        int maxRetries = 3;
+        int retryCount = 0;
+        
+        while (retryCount < maxRetries) {
+            try {
+                connectClient.associateQueueQuickConnects(request);
+                return; // Success, exit the method
+            } catch (TooManyRequestsException e) {
+                retryCount++;
+                logger.log("Rate limit hit, retry attempt " + retryCount + "/" + maxRetries, LogLevel.WARN);
+                
+                if (retryCount >= maxRetries) {
+                    logger.log("Max retries reached for associateQueueQuickConnects", LogLevel.ERROR);
+                    throw e; // Re-throw after max retries
+                }
+                
+                try {
+                    // Wait 1000ms before retry (2 requests/sec = 1000ms between requests)
+                    Thread.sleep(1000);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("Interrupted during retry wait", ie);
+                }
+            }
+        }
+    }
+
+    /**
+     * Simple retry method for createQuickConnect to handle rate limiting (2 requests/sec)
+     */
+    private CreateQuickConnectResponse createQuickConnectWithRetry(CreateQuickConnectRequest request) {
+        int maxRetries = 3;
+        int retryCount = 0;
+        
+        while (retryCount < maxRetries) {
+            try {
+                return connectClient.createQuickConnect(request);
+            } catch (TooManyRequestsException e) {
+                retryCount++;
+                logger.log("Rate limit hit, retry attempt " + retryCount + "/" + maxRetries, LogLevel.WARN);
+                
+                if (retryCount >= maxRetries) {
+                    logger.log("Max retries reached for createQuickConnect", LogLevel.ERROR);
+                    throw e; // Re-throw after max retries
+                }
+                
+                try {
+                    // Wait 1000ms before retry (2 requests/sec = 1000ms between requests)
+                    Thread.sleep(1000);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("Interrupted during retry wait", ie);
+                }
+            }
+        }
+        // This should never be reached due to the throw in the catch block
+        throw new RuntimeException("Unexpected end of retry loop");
+    }
+
     @Override
     public String handleRequest(Object event, Context context) {
         this.logger = context.getLogger();
@@ -46,7 +171,7 @@ public class QuickConnectFunction implements RequestHandler<Object, String> {
         try {
             String eventString = objectMapper.writeValueAsString(event);
             eventJSONMap = objectMapper.readTree(eventString);
-            // If the Event is from S3, else its assumed it's from EventBridge
+            // If the Event is from S3, else it's assumed it's from EventBridge
             if (eventJSONMap.has("Records")) {
                 bucket = eventJSONMap.path("Records").get(0).path("s3").path("bucket").path("name").asText();
                 key = eventJSONMap.path("Records").get(0).path("s3").path("object").path("key").asText();
@@ -116,10 +241,10 @@ public class QuickConnectFunction implements RequestHandler<Object, String> {
         String queueId = record.destinationId();
         // Update existing PhoneNumber Type if its already exist
         if (quickConnectQueueMap.containsKey(queueId)) {
-            //Update Quick Connect for Phone Type
+            //Update Quick Connect for Queue Type
             logger.log("Updating Quick Connect for Queue = " + queueId, LogLevel.INFO);
             logger.log("\n");
-            connectClient.updateQuickConnectName(UpdateQuickConnectNameRequest.builder()
+            updateQuickConnectNameWithRetry(UpdateQuickConnectNameRequest.builder()
                     .instanceId(instanceId)
                     .quickConnectId(quickConnectQueueMap.get(queueId).quickConnectId())
                     .name(record.quickConnectName())
@@ -140,7 +265,7 @@ public class QuickConnectFunction implements RequestHandler<Object, String> {
             //Create Quick Connect for Queue Type
             logger.log("Creating Quick Connect for Queue = " + queueId, LogLevel.INFO);
             logger.log("\n");
-            CreateQuickConnectResponse createQuickConnectResponse = connectClient.createQuickConnect(CreateQuickConnectRequest.builder()
+            CreateQuickConnectResponse createQuickConnectResponse = createQuickConnectWithRetry(CreateQuickConnectRequest.builder()
                     .instanceId(instanceId)
                     .name(record.quickConnectName())
                     .description("Transfer to " + record.quickConnectName())
@@ -166,7 +291,7 @@ public class QuickConnectFunction implements RequestHandler<Object, String> {
         allQueues.forEach(queueSummary -> {
             logger.log("Associating Quick Connects with Queue = " + queueSummary.name(), LogLevel.INFO);
             logger.log("\n");
-            connectClient.associateQueueQuickConnects(AssociateQueueQuickConnectsRequest.builder()
+            associateQueueQuickConnectsWithRetry(AssociateQueueQuickConnectsRequest.builder()
                     .instanceId(instanceId)
                     .quickConnectIds(quickConnectMap.values().stream().map(QuickConnectRecord::quickConnectId).toList())
                     .queueId(queueSummary.id())
@@ -181,7 +306,7 @@ public class QuickConnectFunction implements RequestHandler<Object, String> {
             //Update Quick Connect for Phone Type
             logger.log("Updating Quick Connect for Phone = " + phoneNumber, LogLevel.INFO);
             logger.log("\n");
-            connectClient.updateQuickConnectName(UpdateQuickConnectNameRequest.builder()
+            updateQuickConnectNameWithRetry(UpdateQuickConnectNameRequest.builder()
                     .instanceId(instanceId)
                     .quickConnectId(quickConnectPhoneMap.get(phoneNumber).quickConnectId())
                     .name(record.quickConnectName())
@@ -201,7 +326,7 @@ public class QuickConnectFunction implements RequestHandler<Object, String> {
             //Create Quick Connect for PhoneNumber Type
             logger.log("Creating Quick Connect for Phone = " + phoneNumber, LogLevel.INFO);
             logger.log("\n");
-            CreateQuickConnectResponse createQuickConnectResponse = connectClient.createQuickConnect(CreateQuickConnectRequest.builder()
+            CreateQuickConnectResponse createQuickConnectResponse = createQuickConnectWithRetry(CreateQuickConnectRequest.builder()
                     .instanceId(instanceId)
                     .name(record.quickConnectName())
                     .description("Transfer to " + record.quickConnectName())
@@ -240,7 +365,7 @@ public class QuickConnectFunction implements RequestHandler<Object, String> {
                 logger.log("\n");
                 //Create Quick Connect for this User
                 String quickConnectName = user.identityInfo().firstName() + " " + user.identityInfo().lastName();
-                CreateQuickConnectResponse createQuickConnectResponse = connectClient.createQuickConnect(CreateQuickConnectRequest.builder()
+                CreateQuickConnectResponse createQuickConnectResponse = createQuickConnectWithRetry(CreateQuickConnectRequest.builder()
                         .instanceId(instanceId)
                         .name(quickConnectName)
                         .description("Transfer to " + user.identityInfo().firstName() + " " + user.identityInfo().lastName())
@@ -257,7 +382,7 @@ public class QuickConnectFunction implements RequestHandler<Object, String> {
                 //Update Quick Connect for User Type
                 logger.log("Updating Quick Connect for User = " + user.username(), LogLevel.INFO);
                 logger.log("\n");
-                connectClient.updateQuickConnectName(UpdateQuickConnectNameRequest.builder()
+                updateQuickConnectNameWithRetry(UpdateQuickConnectNameRequest.builder()
                         .instanceId(instanceId)
                         .quickConnectId(quickConnectUserMap.get(user.id()).quickConnectId())
                         .name(user.identityInfo().firstName() + " " + user.identityInfo().lastName())
@@ -282,7 +407,7 @@ public class QuickConnectFunction implements RequestHandler<Object, String> {
             if (searchUsersResponse.users().stream().noneMatch(user -> user.id().equals(quickConnect.userId()))) {
                 logger.log("Removing Quick Connect for User = " + quickConnect.quickConnectName(), LogLevel.INFO);
                 logger.log("\n");
-                connectClient.deleteQuickConnect(DeleteQuickConnectRequest.builder()
+                deleteQuickConnectWithRetry(DeleteQuickConnectRequest.builder()
                         .instanceId(instanceId)
                         .quickConnectId(quickConnect.quickConnectId())
                         .build());
